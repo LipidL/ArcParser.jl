@@ -1,5 +1,9 @@
 module ArcParser
 
-# Write your package code here.
+# Necessary packages
+using LinearAlgebra
+
+include("Atoms.jl")
+include("FileParser.jl")
 
 end

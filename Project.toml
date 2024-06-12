@@ -3,7 +3,12 @@ uuid = "40fd6c00-026b-48ee-98ec-938f22357df0"
 authors = ["lipid <lipid.l@qq.com> and contributors"]
 version = "1.0.0-DEV"
 
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+
 [compat]
+LinearAlgebra = "1"
 julia = "1"
 
 [extras]
