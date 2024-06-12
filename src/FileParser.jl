@@ -1,5 +1,3 @@
-import ArcParser: AtomDataParser, BlockHeaderParser, CellHeaderParser, arc_parse, increment_n_atoms, add_atom
-
 struct AtomDataParser
     re::Regex
 end

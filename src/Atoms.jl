@@ -26,6 +26,9 @@ struct Atom{T}
 end
 Atom(;type::Int = 1, mass::T = 1.0, charge::T = 0.0) where T<:Number = Atom{T}(type, mass, charge)
 Base.isapprox(x::Atom, y::Atom; kwargs...) = x.element == y.element && isapprox(x.position, y.position; kwargs...)
+function extract_position(atom::Atom{T})::Vector{T} where T
+    return collect(atom.position.coo)
+end
 struct Cell{T}
     a::T
     b::T
