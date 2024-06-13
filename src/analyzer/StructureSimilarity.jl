@@ -29,8 +29,8 @@ function calculate_similarity(struct1::Matrix{T}, struct2::Matrix{T}, ::Kabsch )
         error("Two structures should have the same number of atoms")
     end
     num_atoms = size(struct1, 1)
-    center1 = sum(struct1, dims=2) / size(struct1, 1)
-    center2 = sum(struct2, dims=2) / size(struct2, 1)
+    center1 = sum(struct1, dims=1) / size(struct1, 1)
+    center2 = sum(struct2, dims=1) / size(struct2, 1)
     moved1 = struct1 .- center1
     moved2 = struct2 .- center2
     H = moved1' * moved2
