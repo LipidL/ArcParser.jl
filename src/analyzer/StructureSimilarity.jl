@@ -3,7 +3,7 @@ using LinearAlgebra
 function calculate_similarity(structure1::Vector{Atom{T}}, structure2::Vector{Atom{T}}, θ::T) where T
     n_atoms = length(structure1)
     if n_atoms != length(structure2)
-        return Inf64
+        return -Inf64
     end
     similarity = 0.0
     for atomi in structure1
