@@ -30,4 +30,16 @@ using Random
         @test ArcParser.calculate_similarity(gp1_matrix, gp2_matrix, ArcParser.Kabsch()) isa AbstractFloat
         @test ArcParser.calculate_similarity(gp1_matrix, gp2_matrix, ArcParser.Kabsch()) >= 0.0
     end
+    ref1 = ArcParser.read_arc("ref.arc")[1].atoms
+    ref2 = ArcParser.read_arc("ref2.arc")[1].atoms
+    ref1_matrix = Matrix{Float64}(undef, length(ref1),3)
+    ref2_matrix = Matrix{Float64}(undef, length(ref2),3)
+    for i in range(1, length(ref1))
+        ref1_matrix[i, :] = ArcParser.extract_position(ref1[i])
+    end
+    for i in range(1, length(ref2))
+        ref2_matrix[i, :] = ArcParser.extract_position(ref2[i])
+    end
+    similarity = ArcParser.calculate_similarity(ref1_matrix, ref2_matrix, ArcParser.Kabsch())
+    println(similarity)
 end
