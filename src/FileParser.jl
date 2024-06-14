@@ -66,10 +66,13 @@ function arc_parse(line::String, parser::CellHeaderParser)
     return cell_info
 end
 function increment_n_atoms(structure_block::StructureBlock)
-    return StructureBlock(structure_block.n_atoms + 1, structure_block.cell, structure_block.atoms, structure_block.symmetry, structure_block.additional_information)
+    return StructureBlock(structure_block.n_atoms + 1, structure_block.cell, structure_block.energy, structure_block.atoms, structure_block.symmetry, structure_block.additional_information)
 end
 function add_atom(structure_block::StructureBlock, new_atom::Atom)
-    return StructureBlock(structure_block.n_atoms, structure_block.cell, push!(copy(structure_block.atoms), new_atom), structure_block.symmetry, structure_block.additional_information)
+    return StructureBlock(structure_block.n_atoms, structure_block.cell, structure_block.energy, push!(copy(structure_block.atoms), new_atom), structure_block.symmetry, structure_block.additional_information)
+end
+function change_cell(structure_block::StructureBlock, new_cell::Cell)
+    return StructureBlock(structure_block.n_atoms, new_cell, structure_block.energy, structure_block.atoms, structure_block.symmetry, structure_block.additional_information)
 end
 
 function read_arc(filename::String)
@@ -93,16 +96,16 @@ function read_arc(filename::String)
         end
         header_parse_result = arc_parse(line, block_header_parser)
         if header_parse_result !== nothing
-            n, f1, f2, s = header_parse_result
+            n, f1, energy, s = header_parse_result
             if current_block !== nothing
                 push!(blocks, current_block)
             end
-            current_block = ArcParser.StructureBlock{Float64}(0, cell_info, [], s, [])
+            current_block = ArcParser.StructureBlock{Float64}(0, cell_info, energy, [], s, [])
             continue
         end
         cell_parse_result = arc_parse(line, cell_header_parser)
         if cell_parse_result !== nothing
-            cell_info = ArcParser.Cell{Float64}(cell_parse_result...)
+            current_block = ArcParser.change_cell(current_block, ArcParser.Cell{Float64}(cell_parse_result...))
             continue
         end
     end
@@ -110,4 +113,20 @@ function read_arc(filename::String)
         push!(blocks, current_block)
     end
     return blocks
+end
+
+function write_to_arc(structure::StructureBlock, filename::String)
+    f = open(filename, "w")
+    write(f, "!BIOSYM archive 2\n")
+    write(f, "PBC=ON\n")
+    println(f, lpad("Energy", 28), lpad(0, 10), lpad("0.0", 16), lpad(structure.energy, 18), lpad(structure.symmetry, 10))
+    println(f, "!DATE")
+    println(f, "PBC ", lpad(structure.cell.a, 14), lpad(structure.cell.b, 14), lpad(structure.cell.c, 14), lpad(structure.cell.α, 14), lpad(structure.cell.β, 14), lpad(structure.cell.γ, 14))
+    for (i, atom) in enumerate(structure.atoms)
+        println(f, lpad(atom.element, 5), lpad(atom.position[1], 15), lpad(atom.position[2], 15), lpad(atom.position[3], 15), " CORE ", lpad(i+1, 5), " ", lpad(atom.element, 3), lpad(atom.element, 5), lpad(0.0, 6), lpad(i+1, 5))
+    end
+    println(f, "end")
+    println(f, "end")
+    println(f, "\n")
+    close(f)
 end

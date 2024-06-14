@@ -41,6 +41,7 @@ Base.isapprox(x::Cell, y::Cell; kwargs...) = isapprox(x.a, y.a; kwargs...) && is
 struct StructureBlock{T}
     n_atoms::Int64
     cell::Cell{T}
+    energy::T
     atoms::Vector{Atom{T}}
     symmetry::String
     additional_information::Vector{String}
