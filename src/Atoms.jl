@@ -17,7 +17,7 @@ dist2(x::Number, y::Number) = abs2(x - y)
 dist2(x::Point, y::Point) = sum(abs2, x - y)
 dist2(x::Point) = sum(abs2, x)
 
-struct Atom{T}
+mutable struct Atom{T}
     element::String
     type::Int
     mass::T
@@ -29,7 +29,7 @@ Base.isapprox(x::Atom, y::Atom; kwargs...) = x.element == y.element && isapprox(
 function extract_position(atom::Atom{T})::Vector{T} where T
     return collect(atom.position.coo)
 end
-struct Cell{T}
+mutable struct Cell{T}
     a::T
     b::T
     c::T
@@ -38,7 +38,7 @@ struct Cell{T}
     γ::T
 end
 Base.isapprox(x::Cell, y::Cell; kwargs...) = isapprox(x.a, y.a; kwargs...) && isapprox(x.b, y.b; kwargs...) && isapprox(x.c, y.c; kwargs...) && isapprox(x.α, y.α; kwargs...) && isapprox(x.β, y.β; kwargs...) && isapprox(x.γ, y.γ; kwargs...)
-struct StructureBlock{T}
+mutable struct StructureBlock{T}
     n_atoms::Int64
     cell::Cell{T}
     energy::T
