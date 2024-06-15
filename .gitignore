@@ -5,3 +5,5 @@
 /docs/Manifest.toml
 /docs/build/
 *.arc
+!test/ref1.arc
+!test/ref2.arc

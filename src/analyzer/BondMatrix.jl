@@ -23,3 +23,14 @@ function calculate_bond_matrix(structure::Matrix{T}, shreshold::T) where T <: Re
     end
     return bond_matrix
 end
+
+function calculate_bond_matrix(structure::StructureBlock{T}, shreshold::T) where T <: Real
+    return calculate_bond_matrix(calculate_position_matrix(structure), shreshold)   
+end
+
+function calculate_position_matrix(structure::StructureBlock{T}) where T <: Real
+    transposed_mat = reduce(hcat, ([ArcParser.extract_position(atom) for atom in structure.atoms]))
+    retmat = zeros(T, size(transposed_mat, 2), size(transposed_mat, 1))
+    adjoint!(retmat, transposed_mat)
+    return retmat
+end

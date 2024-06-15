@@ -65,11 +65,8 @@ function arc_parse(line::String, parser::CellHeaderParser)
     cell_info = (x, y, z, α, β, γ)
     return cell_info
 end
-function increment_n_atoms(structure_block::StructureBlock)
-    return StructureBlock(structure_block.n_atoms + 1, structure_block.cell, structure_block.energy, structure_block.atoms, structure_block.symmetry, structure_block.additional_information)
-end
 function add_atom(structure_block::StructureBlock, new_atom::Atom)
-    return StructureBlock(structure_block.n_atoms, structure_block.cell, structure_block.energy, push!(copy(structure_block.atoms), new_atom), structure_block.symmetry, structure_block.additional_information)
+    return StructureBlock(structure_block.n_atoms + 1, structure_block.cell, structure_block.energy, push!(copy(structure_block.atoms), new_atom), structure_block.symmetry, structure_block.additional_information)
 end
 function change_cell(structure_block::StructureBlock, new_cell::Cell)
     return StructureBlock(structure_block.n_atoms, new_cell, structure_block.energy, structure_block.atoms, structure_block.symmetry, structure_block.additional_information)
@@ -90,7 +87,6 @@ function read_arc(filename::String)
             s, f1, f2, f3 = atom_data_parse_result
             new_point = ArcParser.Point(f1, f2, f3)
             new_atom = ArcParser.Atom{Float64}(s, 0, 0, 0, new_point)
-            current_block = increment_n_atoms(current_block)
             current_block = add_atom(current_block, new_atom)
             continue
         end
