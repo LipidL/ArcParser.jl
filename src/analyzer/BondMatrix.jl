@@ -34,3 +34,10 @@ function calculate_position_matrix(structure::StructureBlock{T}) where T <: Real
     adjoint!(retmat, transposed_mat)
     return retmat
 end
+
+function calculate_position_matrix(structure::Vector{Atom{T}}) where T <: Real
+    transposed_mat = reduce(hcat, ([ArcParser.extract_position(atom) for atom in structure]))
+    retmat = zeros(T, size(transposed_mat, 2), size(transposed_mat, 1))
+    adjoint!(retmat, transposed_mat)
+    return retmat
+end

@@ -30,3 +30,13 @@ end
     bond_matrix = ArcParser.calculate_bond_matrix(structure, 1.1)
     @test bond_matrix == [0.0 1.0 1.0 1.0; 1.0 0.0 0.0 0.0; 1.0 0.0 0.0 0.0; 1.0 0.0 0.0 0.0]
 end
+
+@testset "position_matrix" begin
+    # Test position_matrix
+    structure = ArcParser.read_arc("ref1.arc")[1]
+    @test ArcParser.calculate_position_matrix(structure) isa Matrix
+    @test size(ArcParser.calculate_position_matrix(structure)) == (length(structure.atoms), 3)
+    @test ArcParser.calculate_position_matrix(structure.atoms) isa Matrix
+    @test size(ArcParser.calculate_position_matrix(structure.atoms)) == (length(structure.atoms), 3)
+    @test ArcParser.calculate_position_matrix(structure) ≈ ArcParser.calculate_position_matrix(structure.atoms)
+end
