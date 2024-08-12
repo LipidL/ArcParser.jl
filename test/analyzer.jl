@@ -17,6 +17,10 @@ using Random
     similarity = ArcParser.calculate_similarity(ref1.atoms, ref2.atoms, ArcParser.SimplifiedSOAP(), 1.0)
     @test similarity isa Float64
     @test similarity >= 0
+    # Test for KabschSOAP similarity
+    similarity = ArcParser.calculate_similarity(ref1_matrix, ref2_matrix, ArcParser.KabschSOAP(), 1.0)
+    @test similarity isa Float64
+    @test similarity >= 0
 end
 
 @testset "bond_matrix" begin

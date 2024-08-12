@@ -4,6 +4,7 @@ using Combinatorics
 abstract type AbstractSimilarityMeasurement end
 struct SimplifiedSOAP <: AbstractSimilarityMeasurement end
 struct Kabsch <: AbstractSimilarityMeasurement end
+struct KabschSOAP <: AbstractSimilarityMeasurement end
 function calculate_similarity(structure1::Vector{Atom{T}}, structure2::Vector{Atom{T}}, ::SimplifiedSOAP, θ::T) where T
     n_atoms = length(structure1)
     if n_atoms != length(structure2)
@@ -22,7 +23,34 @@ function calculate_similarity(structure1::Vector{Atom{T}}, structure2::Vector{At
     return similarity
 end
 
+function calculate_similarity(struct1::Matrix{T}, struct2::Matrix{T}, ::KabschSOAP, θ::T) where T
+    num_atoms = size(struct1, 1)
+    center2 = sum(struct2, dims=1) / num_atoms
+    moved2 = struct2 .- center2
+    moved1 = calculate_turned_matrix(struct1, struct2, Kabsch())
+    similarity = 0.0
+    for i in 1:num_atoms
+        r_i = moved1[i, :]
+        for j in 1:num_atoms
+            r_j = moved2[j, :]
+            tmp = -LinearAlgebra.norm(r_i - r_j)/(4*θ^2)
+            similarity += exp(tmp)
+        end
+    end
+    similarity /= num_atoms
+    return similarity
+end
+ 
 function calculate_similarity(struct1::Matrix{T}, struct2::Matrix{T}, ::Kabsch ) where T
+    num_atoms = size(struct1, 1)
+    center2 = sum(struct2, dims=1) / num_atoms
+    moved2 = struct2 .- center2
+    moved1 = calculate_turned_matrix(struct1, struct2, Kabsch())
+    similarity = LinearAlgebra.norm(moved1 - moved2) / sqrt(num_atoms)
+    return similarity
+end
+
+function calculate_turned_matrix(struct1::Matrix{T}, struct2:: Matrix{T}, ::Kabsch) where T
     if size(struct1, 2) != 3 || size(struct2, 2) != 3
         error("Input matrix should be a n*3 matrix")
     end
@@ -54,6 +82,7 @@ function calculate_similarity(struct1::Matrix{T}, struct2::Matrix{T}, ::Kabsch )
     end
     # Calculate RMSD for each permuted matrix
     minimum_rmsd = Inf64
+    minimum_struct1 = Matrix{Float64}(undef, size(struct1, 1), 3)
     num_atoms = size(struct1, 1)
     for permuted_struct1 in permuted_matrices
         center1 = sum(permuted_struct1, dims=1) / size(permuted_struct1, 1)
@@ -68,7 +97,8 @@ function calculate_similarity(struct1::Matrix{T}, struct2::Matrix{T}, ::Kabsch )
         rmsd = LinearAlgebra.norm(moved1 - moved2) / sqrt(num_atoms)
         if rmsd < minimum_rmsd
             minimum_rmsd = rmsd
+            minimum_struct1 = moved1
         end
     end
-    return minimum_rmsd
+    return minimum_struct1  
 end
